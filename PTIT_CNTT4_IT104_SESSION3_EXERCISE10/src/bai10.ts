@@ -1,32 +1,105 @@
-// //mảng chauws danh sch sinh viên
-// let students = [];
-// //tạo hàm thêm thông tin sinh viên 
-// function addStudent(id, name, age, subject) {
-//     const newStudent = {
-//         id: id,
-//         name: name,
-//         age: age,
-//         subjects: subject
-//     };
-//     students.push(newStudent);
-// }
-// addStudent(1, "Nguyễn Văn A", 20, [{ subjectName: "Toán", score: 8 }, { subjectName: "Lý", score: 7 }, { subjectName: "Hóa", score: 9 }]);
-// //hàm in thông tin sinh viên
-// function printStudents() {
-//     for (let i = 0; i < students.length; i++) {
-//         console.log(`thông tin sinh viên vị trí thứ ${i + 1}`);
-//     }
-// }
-// printStudents();
-// //hàm xóa sinh viên
-// function deleteStudent(id) {
-//     //kiểm tra xem sinh viên có tồn tại trong mảng hay không
-//     const index = students.findIndex(student => student.id === id);
-//     if (index !== -1) {
-//         students.splice(index, 1);
-//         console.log(`Đã xóa sinh viên có id ${id}`);
-//     }
-//     else {
-//         console.log(`Không tìm thấy sinh viên có id ${id}`);
-//     }
-// }
+type Student = {
+  readonly studentId: string;
+  name: string;
+  email: string;
+  hasCompleted: boolean;
+  finalScore?: number;
+};
+
+type Course = {
+  courseId: string;
+  title: string;
+  instructor: string;
+  students: Student[];
+  isActive: boolean;
+};
+
+type CourseManager = {
+  schoolName: string;
+  year: number;
+  courses: Course[];
+};
+
+function getCompletedStudents(course: Course): Student[] {
+  return course.students.filter(s => s.hasCompleted);
+}
+
+function calculateAverageScore(course: Course): number | null {
+  const scores = course.students
+    .filter(s => s.finalScore !== undefined)
+    .map(s => s.finalScore!);
+  if (scores.length === 0) {
+    return null;
+  }
+  const total = scores.reduce((sum, score) => sum + score, 0);
+  return total / scores.length;
+}
+
+function printCourseReport(manager: CourseManager): void {
+  manager.courses.forEach((course, index) => {
+    console.log(`${index + 1}.Khóa: ${course.title} (GV: ${course.instructor})`);
+    console.log(`   - Tổng học viên: ${course.students.length}`);
+    console.log(`   - Hoàn thành: ${getCompletedStudents(course).length} học viên`);
+    const avg = calculateAverageScore(course);
+    const avgStr = avg === null ? "N/A" : avg.toFixed(1);
+    console.log(`   - Trung bình điểm: ${avgStr}`);
+    console.log(`   - Trạng thái: ${course.isActive ? "ĐANG MỞ" : "ĐÃ ĐÓNG"}\n`);
+  });
+}
+
+const manager: CourseManager = {
+  schoolName: "Code School",
+  year: 2025,
+  courses: [
+    {
+      courseId: "C001",
+      title: "TypeScript Cơ Bản",
+      instructor: "Nguyễn Văn A",
+      isActive: true,
+      students: [
+        {
+          studentId: "S1",
+          name: "Nam",
+          email: "nam@gmail.com",
+          hasCompleted: true,
+          finalScore: 9
+        },
+        {
+          studentId: "S2",
+          name: "Lan",
+          email: "lan@gmail.com",
+          hasCompleted: true,
+          finalScore: 8
+        },
+        {
+          studentId: "S3",
+          name: "Bình",
+          email: "binh@gmail.com",
+          hasCompleted: false
+        }
+      ]
+    },
+    {
+      courseId: "C002",
+      title: "HTML & CSS",
+      instructor: "Trần Thị B",
+      isActive: false,
+      students: [
+        {
+          studentId: "S4",
+          name: "Huy",
+          email: "huy@gmail.com",
+          hasCompleted: false
+        },
+        {
+          studentId: "S5",
+          name: "Minh",
+          email: "minh@gmail.com",
+          hasCompleted: false
+        }
+      ]
+    }
+  ]
+};
+
+printCourseReport(manager);
